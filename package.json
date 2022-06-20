@@ -1,0 +1,7 @@
+{
+  "name": "setup-developer-popos",
+  "packageManager": "yarn@3.2.1",
+  "dependencies": {
+    "prettier": "^2.7.1"
+  }
+}
