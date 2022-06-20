@@ -102,7 +102,26 @@ Python and NodeJS developers.
    ansible-playbook --ask-become-pass ~/Repositories/setup-developer-popos/playbooks/configure-secure-boot/main.yml
    ```
 4. Restart into UEFI and enable secure boot
-5. Setup system
+5. Enroll hashes see [Enroll UEFI Hashes](#enroll-uefi-hashes)
+6. Setup system
    ```shell
    ansible-playbook --ask-become-pass ~/Repositories/setup-developer-popos/playbooks/setup/main.yml
    ```
+
+## Enroll UEFI Hashes
+
+### After an kernel update
+
+You will see a screen that complains about failing to start
+
+1. Click `OK`
+2. Click on `Enroll Hash`
+3. Navigate to `../`
+4. Navigate to `Pop_OS-...` (... is a UUID4 and unique for each installation)
+5. Navigate to `vmlinuz.efi` and press enter and confirm
+
+### After a systemd-boot update
+
+1. Click `OK`
+2. Click on `Enroll Hash`
+3. Navigate to `loader.efi` and press enter and confirm

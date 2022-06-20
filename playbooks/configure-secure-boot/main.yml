@@ -28,6 +28,7 @@
         dest: /boot/efi/EFI/systemd/HashTool.efi
     - name: Copy systemd-bootx64.efi to loader.efi
       ansible.builtin.copy:
+        remote_src: yes
         src: /boot/efi/EFI/systemd/systemd-bootx64.efi
         dest: /boot/efi/EFI/systemd/loader.efi
 
@@ -43,7 +44,7 @@
           - efibootmgr
           - list
     - name: Create boot entry
-      when: "'PreLoader' in boot_entries.stdout"
+      when: "'PreLoader' not in boot_entries.stdout"
       ansible.builtin.command:
         argv:
           - efibootmgr
