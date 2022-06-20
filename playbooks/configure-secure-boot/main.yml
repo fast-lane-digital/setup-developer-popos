@@ -1,16 +1,16 @@
 ---
-- name: Add preloader
+- name: Add PreLoader for secure boot
   become: yes
   hosts: 127.0.0.1
   connection: local
   tasks:
-    - name: Check if preloader is already present
+    - name: Check if PreLoader is already present
       ansible.builtin.stat:
         path: /boot/efi/EFI/systemd/PreLoader.efi
         checksum_algorithm: md5
-      register: preloader_efi
+      register: pre_loader_efi
     - name: Download PreLoader binary
-      when: preloader_efi.stat.checksum != "4f7a4f566781869d252a09dc84923a82"
+      when: not pre_loader_efi.exists or pre_loader_efi.stat.checksum != "4f7a4f566781869d252a09dc84923a82"
       ansible.builtin.get_url:
         url: https://blog.hansenpartnership.com/wp-uploads/2013/PreLoader.efi
         checksum: "md5:4f7a4f566781869d252a09dc84923a82"
@@ -21,7 +21,7 @@
         checksum_algorithm: md5
       register: hash_tool_efi
     - name: Download HashTool binary
-      when: hash_tool_efi.stat.checksum == "45639d23aa5f2a394b03a65fc732acf2"
+      when: not hash_tool_efi.exists or hash_tool_efi.stat.checksum != "45639d23aa5f2a394b03a65fc732acf2"
       ansible.builtin.get_url:
         url: https://blog.hansenpartnership.com/wp-uploads/2013/HashTool.efi
         checksum: "md5:45639d23aa5f2a394b03a65fc732acf2"
