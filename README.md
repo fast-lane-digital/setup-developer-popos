@@ -17,53 +17,71 @@ Python and NodeJS developers.
 
 ## Installation
 
-1. Ignore installer menu for now
+1. Close the installer using right click in the bottom bar
 2. Open terminal
-3. List devices and partitions `sudo fdisk -l`
-4. Modify partition table of the primary disk
-   e.g. `sudo cfdisk /dev/nvme0n1` or `sudo cfdisk /dev/sda`
-   1. If no partition with type `EFI System` exists that is larger than 500MB
-      1. Create a new partition with 500MB
+3. List devices and partitions to determine which disk to use
+   ```shell
+   sudo fdisk -l
+   ```
+4. Modify partition table of the primary disk, e.g.
+   ```shell
+   sudo cfdisk /dev/nvme0n1
+   ```
+   or
+   ```shell
+   sudo cfdisk /dev/sda
+   ```
+   1. If no partition with type `EFI System` exists that is larger than `500MB`
+      1. Create a new partition with `500MB`
       2. Select the partition using the up and down arrow keys
       3. Select `Type` using the left and right arrow keys and press enter
       4. Select `EFI System` and press enter
-   2. Create a new partition using the remaining space (needs to be at least 150GB
-      large)
-5. List devices and partitions `sudo fdisk -l` to determine the primary OS partition
-6. Run `export PARTITION=/dev/nvme0n1p2` and replace `nvme0n1p2` with the correct
-   partition from the previous step
-7. To initialize the encrypted OS partition run the following commands
-   1. Create encrypted partition
-      `sudo cryptsetup luksFormat "/dev/$PARTITION"`
-   2. Open encrypted partition
-      `sudo cryptsetup luksOpen "/dev/$PARTITION" linux-temp`
-   3. Create LVM
+   2. Create a new partition using the remaining space
+      (Required `150GB`; Recommended `250GB+`)
+   3. List devices and partitions to determine the primary OS partition
       ```shell
-      sudo pvcreate /dev/mapper/linux-temp
-      sudo vgcreate pop_os /dev/mapper/linux-temp
-      sudo lvcreate -n root -l +100%FREE pop_os
-      sudo mkfs -t ext4 /dev/mapper/pop_os-root
+      sudo fdisk -l
       ```
-8. Switch to installer
-9. Click through configuration until you can select between `Clean Install` and
-   `Custom (Advanced)` and select the later
-10. Select the partitions
-    1. Depending on the partitioning steps select the `EFI` partition
-       1. If you had to create a new one
-          ```
-          Format: true
-          Use as: Boot (/boot/efi)
-          Filesystem: fat32
-          ```
-       2. If the existing partition was large enough
-          ```
-          Format: false <- REALLY IMPORTANT OTHERWISE WINDOWS WONT BOOT
-          Use as: Boot (/boot/efi)
-          Filesystem: fat32
-          ```
-    2. Select the OS partition (easily identifiable by the lock symbol)
-11. Continue with installer steps
-    1. For the username it is recommended to use the given + family name separated by an
-       underscore; e.g. `fabian_haenel`
+   4. Export the `DEVICE` environment variable with the OS partition, e.g.
+      ```shell
+      export DEVICE=/dev/nvme0n1p2
+      ```
+   5. To initialize the encrypted OS partition run the following commands
+      1. Create encrypted partition
+         ```shell
+         sudo cryptsetup luksFormat "$DEVICE"
+         ```
+      2. Open encrypted partition
+         ```shell
+         sudo cryptsetup luksOpen "$DEVICE" linux-temp
+         ```
+      3. Create LVM
+         ```shell
+         sudo pvcreate /dev/mapper/linux-temp \
+         && sudo vgcreate pop_os /dev/mapper/linux-temp \
+         && sudo lvcreate -n root -l +100%FREE pop_os \
+         && sudo mkfs -t ext4 /dev/mapper/pop_os-root
+         ```
+   6. Switch to installer
+   7. Click through configuration until you can select between `Clean Install` and
+      `Custom (Advanced)` and select the later
+   8. Select the partitions
+      1. Depending on the partitioning steps select the `EFI` partition
+         1. If you had to create a new one
+            ```
+            Format: true
+            Use as: Boot (/boot/efi)
+            Filesystem: fat32
+            ```
+         2. If the existing partition was large enough
+            ```
+            Format: false <- REALLY IMPORTANT OTHERWISE WINDOWS WONT BOOT
+            Use as: Boot (/boot/efi)
+            Filesystem: fat32
+            ```
+      2. Select the OS partition (easily identifiable by the lock symbol)
+   9. Continue with installer steps
+      1. For the username it is recommended to use the given + family name separated by an
+         underscore; e.g. `fabian_haenel`
 
 ## Setup
