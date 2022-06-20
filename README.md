@@ -85,3 +85,24 @@ Python and NodeJS developers.
          underscore; e.g. `fabian_haenel`
 
 ## Setup
+
+1. Install Ansible
+   ```shell
+   sudo apt install python3-pip \
+   && sudo pip install ansible
+   ```
+2. Download repository containing playbook
+   ```shell
+   mkdir ~/Repositories \
+   && cd ~/Repositories \
+   && git clone https://github.com/fast-lane-digital/setup-developer-popos.git
+   ```
+3. Configure PreLoader to allow secure boot
+   ```shell
+   ansible-playbook --ask-become-pass ~/Repositories/setup-developer-popos/playbooks/configure-secure-boot/main.yml
+   ```
+4. Restart into UEFI and enable secure boot
+5. Setup system
+   ```shell
+   ansible-playbook --ask-become-pass ~/Repositories/setup-developer-popos/playbooks/setup/main.yml
+   ```

@@ -1,0 +1,58 @@
+---
+- name: Add preloader
+  become: yes
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Check if preloader is already present
+      ansible.builtin.stat:
+        path: /boot/efi/EFI/systemd/PreLoader.efi
+        checksum_algorithm: md5
+      register: preloader_efi
+    - name: Download PreLoader binary
+      when: preloader_efi.stat.checksum != "4f7a4f566781869d252a09dc84923a82"
+      ansible.builtin.get_url:
+        url: https://blog.hansenpartnership.com/wp-uploads/2013/PreLoader.efi
+        checksum: "md5:4f7a4f566781869d252a09dc84923a82"
+        dest: /boot/efi/EFI/systemd/PreLoader.efi
+    - name: Check if HashTool is already present
+      ansible.builtin.stat:
+        path: /boot/efi/EFI/systemd/HashTool.efi
+        checksum_algorithm: md5
+      register: hash_tool_efi
+    - name: Download HashTool binary
+      when: hash_tool_efi.stat.checksum == "45639d23aa5f2a394b03a65fc732acf2"
+      ansible.builtin.get_url:
+        url: https://blog.hansenpartnership.com/wp-uploads/2013/HashTool.efi
+        checksum: "md5:45639d23aa5f2a394b03a65fc732acf2"
+        dest: /boot/efi/EFI/systemd/HashTool.efi
+    - name: Copy systemd-bootx64.efi to loader.efi
+      ansible.builtin.copy:
+        src: /boot/efi/EFI/systemd/systemd-bootx64.efi
+        dest: /boot/efi/EFI/systemd/loader.efi
+
+- name: Add boot entry
+  become: yes
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: List boot entries
+      register: boot_entries
+      ansible.builtin.command:
+        argv:
+          - efibootmgr
+          - list
+    - name: Create boot entry
+      when: "'PreLoader' in boot_entries.stdout"
+      ansible.builtin.command:
+        argv:
+          - efibootmgr
+          - --disk
+          - "{{ (ansible_facts.mounts | selectattr('mount','equalto','/boot/efi') | first).device | regex_search('^(/dev/)((nvme\\d+n\\d+)|(sd[a-z]))') }}"
+          - --part
+          - "{{ (ansible_facts.mounts | selectattr('mount','equalto','/boot/efi') | first).device | regex_search('\\d+$') }}"
+          - --create
+          - --label
+          - PreLoader
+          - --loader
+          - /EFI/systemd/PreLoader.efi
