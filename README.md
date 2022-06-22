@@ -101,10 +101,10 @@ Python and NodeJS developers.
    ```shell
    ansible-playbook \
     --user "$USER" \
-    --inventory "~/Repositories/setup-developer-popos/inventory" \
+    --inventory ~/Repositories/setup-developer-popos/inventory \
     --connection=local \
     --ask-become-pass \
-    "~/Repositories/setup-developer-popos/playbooks/configure-secure-boot/main.yml"
+    ~/Repositories/setup-developer-popos/playbooks/configure-secure-boot/main.yml
    ```
 4. Restart into UEFI and enable secure boot
 5. Enroll hashes see [Enroll UEFI Hashes](#enroll-uefi-hashes)
@@ -112,10 +112,10 @@ Python and NodeJS developers.
    ```shell
    ansible-playbook \
     --user "$USER" \
-    --inventory "~/Repositories/setup-developer-popos/inventory" \
+    --inventory ~/Repositories/setup-developer-popos/inventory \
     --connection=local \
     --ask-become-pass \
-     "~/Repositories/setup-developer-popos/playbooks/install-apps/main.yml"
+    ~/Repositories/setup-developer-popos/playbooks/install-apps/main.yml
    ```
 
 ## Enroll UEFI Hashes
