@@ -55,3 +55,15 @@
           - PreLoader
           - --loader
           - /EFI/systemd/PreLoader.efi
+
+- name: Add systemd=boot config
+  become: yes
+  hosts: all
+  tasks:
+    - name: Copy loader.conf
+      ansible.builtin.copy:
+        src: ./files/loader.conf
+        dest: /boot/efi/loader/loader.conf
+        owner: root
+        group: root
+        mode: "0700"

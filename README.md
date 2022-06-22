@@ -12,8 +12,10 @@ Python and NodeJS developers.
    At least `150GB` should be made available, recommended are `250GB`
 4. Exit and reboot the computer
 5. Disable `Secure Boot` in the UEFI
-6. Insert USB Stick with Pop!Os installer
-7. Select installer as boot device
+6. Validate that SATA mode is set to AHCI
+   1. If not see [Switch IDE/RAID to AHCI](#switch-ideraid-to-ahci)
+7. Insert USB Stick with Pop!Os installer
+8. Select installer as boot device
 
 ## Installation
 
@@ -135,3 +137,31 @@ You will see a screen that complains about failing to start
 1. Click `OK`
 2. Click on `Enroll Hash`
 3. Navigate to `loader.efi` and press enter and confirm
+
+## Switch IDE/RAID to AHCI
+
+1. Click the Windows button and type cmd
+2. Right-click the result and select `Run as administrator`
+3. Type the following command and press ENTER
+   ```Batchfile
+   bcdedit /set {current} safeboot minimal
+   ```
+   alternatively
+   ```Batchfile
+   bcdedit /set safeboot minimal
+   ```
+4. Restart the computer and enter UEFI Setup
+5. Change the SATA Operation mode to `AHCI` from either `IDE` or `RAID`
+6. Save changes and reboot and Windows will automatically boot to `Safe Mode`.
+7. Right-click the Windows Start Menu once more. Choose Command Prompt (Admin).
+8. Type this command and press ENTER
+   ```Batchfile
+   bcdedit /deletevalue {current} safeboot
+   ```
+   alternatively
+   ```Batchfile
+   bcdedit /deletevalue safeboot
+   ```
+9. Reboot once more and Windows will automatically start with AHCI drivers enabled.
+
+[Reference](https://support.thinkcritical.com/kb/articles/switch-windows-10-from-raid-ide-to-ahci)
