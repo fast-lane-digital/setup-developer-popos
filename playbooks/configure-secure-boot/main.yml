@@ -1,8 +1,7 @@
 ---
 - name: Add PreLoader for secure boot
   become: yes
-  hosts: 127.0.0.1
-  connection: local
+  hosts: all
   tasks:
     - name: Check if PreLoader is already present
       ansible.builtin.stat:
@@ -34,8 +33,7 @@
 
 - name: Add boot entry
   become: yes
-  hosts: 127.0.0.1
-  connection: local
+  hosts: all
   tasks:
     - name: List boot entries
       register: boot_entries

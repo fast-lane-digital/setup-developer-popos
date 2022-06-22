@@ -99,13 +99,23 @@ Python and NodeJS developers.
    ```
 3. Configure PreLoader to allow secure boot
    ```shell
-   ansible-playbook --ask-become-pass ~/Repositories/setup-developer-popos/playbooks/configure-secure-boot/main.yml
+   ansible-playbook \
+    --user "$USER" \
+    --inventory "~/Repositories/setup-developer-popos/inventory" \
+    --connection=local \
+    --ask-become-pass \
+    "~/Repositories/setup-developer-popos/playbooks/configure-secure-boot/main.yml"
    ```
 4. Restart into UEFI and enable secure boot
 5. Enroll hashes see [Enroll UEFI Hashes](#enroll-uefi-hashes)
 6. Setup system
    ```shell
-   ansible-playbook --inventory "${USER}@127.0.0.1" --connection=local --ask-become-pass ~/Repositories/setup-developer-popos/playbooks/setup/main.yml
+   ansible-playbook \
+    --user "$USER" \
+    --inventory "~/Repositories/setup-developer-popos/inventory" \
+    --connection=local \
+    --ask-become-pass \
+     "~/Repositories/setup-developer-popos/playbooks/install-apps/main.yml"
    ```
 
 ## Enroll UEFI Hashes
