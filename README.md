@@ -105,7 +105,7 @@ Python and NodeJS developers.
 5. Enroll hashes see [Enroll UEFI Hashes](#enroll-uefi-hashes)
 6. Setup system
    ```shell
-   ansible-playbook --ask-become-pass ~/Repositories/setup-developer-popos/playbooks/setup/main.yml
+   ansible-playbook --inventory "${USER}@127.0.0.1" --connection=local --ask-become-pass ~/Repositories/setup-developer-popos/playbooks/setup/main.yml
    ```
 
 ## Enroll UEFI Hashes

@@ -1,0 +1,181 @@
+---
+- name: Configure flatpak
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add default flathub
+      community.general.flatpak_remote:
+        name: flathub
+        flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+        state: present
+
+- name: Install Python
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add deadsnakes PPA
+      ansible.builtin.apt_repository:
+        repo: ppa:deadsnakes/ppa
+        state: present
+    - name: Install Python package
+      ansible.builtin.apt:
+        package:
+          - python3.9
+        state: present
+
+- name: Install nodejs
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add nodesource signing key
+      ansible.builtin.apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+    - name: Add nodejs 16 PPA
+      ansible.builtin.apt_repository:
+        repo: "deb https://deb.nodesource.com/node_16.x {{ ansible_facts.distribution_release }} main"
+        state: present
+    - name: Install nodejs
+      ansible.builtin.apt:
+        package: nodejs
+        state: present
+    - name: Enable corepack
+      ansible.builtin.command:
+        cmd: corepack enable
+
+- name: Install Docker
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add Docker signing key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: Add Docker PPA
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_facts.distribution_release }} stable"
+        state: present
+    - name: Install docker packages
+      ansible.builtin.apt:
+        package:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+    - name: Add current user to docker group
+      ansible.builtin.user:
+        name: "{{ ansible_facts.env.SUDO_USER }}"
+        append: yes
+        groups:
+          - docker
+        state: present
+
+- name: Install MongoDB tools
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add MongoDB signing key
+      ansible.builtin.apt_key:
+        url: https://www.mongodb.org/static/pgp/server-5.0.asc
+        state: present
+    - name: Add MongoDB PPA
+      when: "(ansible_facts.distribution_major_version | int) < 22" # MongoDB is not yet supporting Ubuntu 22.04
+      ansible.builtin.apt_repository:
+        repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu {{ ansible_facts.distribution_release }}/mongodb-org/5.0 multiverse"
+        state: present
+    - name: Install MongoDB CLI tools
+      when: "(ansible_facts.distribution_major_version | int) < 22" # MongoDB is not yet supporting Ubuntu 22.04
+      ansible.builtin.apt:
+        package:
+          - mongodb-database-tools
+          - mongocli
+        state: present
+    - name: Install MongoDB Compass
+      ansible.builtin.apt:
+        deb: https://downloads.mongodb.com/compass/mongodb-compass_1.32.2_amd64.deb
+        #        name: mongodb-compass
+        state: present
+
+- name: Install KeePassXC
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add KeePassXC PPA
+      ansible.builtin.apt_repository:
+        repo: ppa:phoerious/keepassxc
+        state: present
+    - name: Install KeePassXC package
+      ansible.builtin.apt:
+        package:
+          - keepassxc
+        state: present
+
+- name: Install Enpass
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add Enpass signing key
+      ansible.builtin.apt_key:
+        url: https://apt.enpass.io/keys/enpass-linux.key
+        state: present
+    - name: Add Enpass PPA
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://apt.enpass.io/ stable main
+        state: present
+    - name: Install Enpass package
+      ansible.builtin.apt:
+        package:
+          - enpass
+        state: present
+
+- name: Install Microsoft apps
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add Microsoft signing key
+      ansible.builtin.apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+    - name: Add VSCode repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+        state: present
+    - name: Install Microsoft packages
+      ansible.builtin.apt:
+        package:
+          - code
+        state: present
+    - name: Install Teams flatpak
+      community.general.flatpak:
+        name: com.microsoft.Teams
+        state: present
+
+- name: Install Zoom
+  become: yes
+  hosts: all
+  tasks:
+    - name: Install Zoom flatpak
+      community.general.flatpak:
+        name: us.zoom.Zoom
+        state: present
+
+- name: Install Postman
+  become: yes
+  hosts: all
+  tasks:
+    - name: Install Postman flatpak
+      community.general.flatpak:
+        name: com.getpostman.Postman
+        state: present
+
+- name: Install VPN
+  become: yes
+  hosts: all
+  tasks:
+    - name: Install VPN packages
+      ansible.builtin.apt:
+        package:
+          - network-manager-openconnect
+          - network-manager-openconnect-gnome
+          - wireguard-tools
