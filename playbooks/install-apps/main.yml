@@ -78,6 +78,37 @@
           - docker
         state: present
 
+- name: Install kubernetes tools
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add Google signing key
+      ansible.builtin.apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+    - name: Add helm signing key
+      ansible.builtin.apt_key:
+        url: https://baltocdn.com/helm/signing.asc
+        state: present
+    - name: Add kubernetes PPA
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/trusted.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+        state: present
+    - name: Get architecture
+      ansible.builtin.command:
+        cmd: dpkg --print-architecture
+      register: dpkg_architecture
+    - name: Add helm PPA
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ dpkg_architecture.stdout }} signed-by=/etc/apt/trusted.gpg] https://baltocdn.com/helm/stable/debian/ all main"
+        state: present
+    - name: Install kubernetes packages
+      ansible.builtin.apt:
+        package:
+          - kubectl
+          - helm
+        state: present
+
 - name: Install MongoDB tools
   become: yes
   hosts: all
