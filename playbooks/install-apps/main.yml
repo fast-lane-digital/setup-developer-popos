@@ -179,10 +179,15 @@
       ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
         state: present
+    - name: Add Azure CLI repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ ansible_facts.distribution_release }} main"
+        state: present
     - name: Install Microsoft packages
       ansible.builtin.apt:
         package:
           - code
+          - azure-cli
         state: present
     - name: Install Teams flatpak
       community.general.flatpak:
@@ -217,3 +222,37 @@
           - network-manager-openconnect
           - network-manager-openconnect-gnome
           - wireguard-tools
+
+- name: Install Terraform
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add Terraform signing key
+      ansible.builtin.apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+    - name: Add Terraform PPA
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ dpkg_architecture.stdout }} signed-by=/etc/apt/trusted.gpg] https://apt.releases.hashicorp.com {{ ansible_facts.distribution_release }} main"
+        state: present
+    - name: Install Terraform package
+      ansible.builtin.apt:
+        package:
+          - terraform
+        state: present
+
+- name: Install Remmina remote desktop client
+  become: yes
+  hosts: all
+  tasks:
+    - name: Add Remmina PPA
+      ansible.builtin.apt_repository:
+        repo: ppa:remmina-ppa-team/remmina-next
+        state: present
+    - name: Install Remmina packages
+      ansible.builtin.apt:
+        package:
+          - remmina
+          - remmina-plugin-rdp
+          - remmina-plugin-secret
+        state: present
