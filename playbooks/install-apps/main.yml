@@ -256,3 +256,23 @@
           - remmina-plugin-rdp
           - remmina-plugin-secret
         state: present
+
+- name: Install kubeseal CLI
+  become: yes
+  hosts: all
+  vars:
+    version: 0.18.1
+  tasks:
+    - name: Download release package
+      ansible.builtin.get_url:
+        url: "https://github.com/bitnami-labs/sealed-secrets/releases/download/v{{ version }}/kubeseal-{{ version }}-linux-amd64.tar.gz"
+        dest: "/tmp/kubeseal-{{ version }}-linux-amd64.tar.gz"
+    - name: Unpack kubeseal tar
+      ansible.builtin.unarchive:
+        src: "/tmp/kubeseal-{{ version }}-linux-amd64.tar.gz"
+        dest: /usr/local/bin
+        include: kubeseal
+        owner: root
+        group: root
+        remote_src: yes
+        mode: 0755
